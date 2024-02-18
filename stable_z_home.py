@@ -14,6 +14,7 @@ class StableZHome:
         self.printer = config.get_printer()
         self.gcode = self.printer.lookup_object('gcode')
         gcode_macro = self.printer.load_object(config, 'gcode_macro')
+        self.gcode_move = self.printer.load_object(config, 'gcode_move')
         self.before_homing_gcode = gcode_macro.load_template(config, 'gcode')
         self.default_max_retries = config.getint("retries", 20, minval=0)
         self.default_retry_tolerance = \
@@ -71,11 +72,31 @@ class StableZHome:
             self.gcode.run_script_from_command('G28 Z')
 
             mcu_position_offset = -stepper.mcu_to_commanded_position(0)
+            # self.gcode.respond_info("MCU position offset: %.4f" % mcu_position_offset)
+
+            # self.gcode.respond_info("Commanded position: %.4f" % stepper.get_commanded_position())
+            # self.gcode.respond_info("MCU position: %.4f" % stepper.get_mcu_position())
+            
+            zOffset = self.gcode_move.get_status()['homing_origin'].z
+            # self.gcode.respond_info("Z Offset: %.4f" % zOffset)
+            
+            stepper_pos_offset = 18 + (zOffset * 5)
+            stepper_window_range_offset = stepper_pos_offset * 3
+            # self.gcode.respond_info("Stepper Window Offset: %.4f" % stepper_window_range_offset)
+            
             mcu_pos = stepper.get_commanded_position() + mcu_position_offset
+            
+            # Safely get the last value if the list is not empty
+            last_mcu_pos = mcu_z_readings[-1] if mcu_z_readings else None
+
+            # Check if last_mcu_pos is not None (which means the list was not empty)
+            if last_mcu_pos is not None:
+                self.gcode.respond_info("stepper_z diff: %.4f" % (mcu_pos - last_mcu_pos - stepper_pos_offset))
+                
             mcu_z_readings.append(mcu_pos)
             mcu_z_readings = mcu_z_readings[-window:]
             if len(mcu_z_readings) == window:
-                window_range = max(mcu_z_readings) - min(mcu_z_readings)
+                window_range = abs( ( max(mcu_z_readings) - min(mcu_z_readings) ) - stepper_window_range_offset )
             else:
                 window_range = None
 
