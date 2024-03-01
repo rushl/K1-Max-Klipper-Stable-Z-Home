@@ -5,13 +5,13 @@ performance of first layers. The Z home level was changing each time the printer
 causing some first layers to be too close, and others to be too high. It was impossible
 to compensate for the drifting base Z level by setting a Z-offset, since the Z home level
 was different each time it homed. This resulted in difficult to resolve and apparently 
-random print failures.
+random print failures._
 
-This module was designed to solve the issue, but did not function as expected at first. With 
+_This module was designed to solve the issue, but did not function as expected at first. With 
 some adjustments, it now functions on my K1 Max. It has dramatically improved the consistancy
-of my first layers, and I no longer need to change the Z-offset at the start of every print!
+of my first layers, and I no longer need to change the Z-offset at the start of every print!_
 
-This module should be considered experimental. No guarentees are made that it will work on your
+_This module should be considered experimental. No guarentees are made that it will work on your
 K1 Max. Nor has it been tested on any other Klipper printer. I bear no responsiblity for any damage
 caused by the use of this module. Use it at your own risk._
 
